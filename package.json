@@ -11,8 +11,24 @@
   "license": "Apache",
   "dependencies": {
     "@google-cloud/bigquery": "^4.3.0",
+    "@google-cloud/tasks": "^1.5.1",
     "express": "^4.17.1",
     "lighthouse": "^4.3.1",
     "puppeteer": "^1.15.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "eslint-config-google": "^0.14.0"
+  },
+  "eslintConfig": {
+    "env": {
+        "node": true,
+        "es6": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 2017,
+      "sourceType": "module"
+    },
+    "extends": "google"
   }
 }

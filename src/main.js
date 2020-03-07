@@ -21,30 +21,36 @@ app.get('/', (req, res) => {
 });
 
 app.post('/', (req, res) => {
-    let payload = req.body;
-    let lhAudit = new LighthouseAudit(payload.urls, perfConfig);
+  const payload = req.body;
+  const lhAudit = new LighthouseAudit(payload.urls, perfConfig);
 
-    lhAudit.run().then((auditResults) => {
-      // TODO: Add parameter in URL to make saving to BQ as optional
-      //writeResultStream(BQ_DATASET, BQ_TABLE, auditResults).then(() => {
-      //  return res.json(auditResults);
-      //});
+  lhAudit.run().then((auditResults) => {
+    // TODO: Add parameter in URL to make saving to BQ as optional
+    writeResultStream(BQ_DATASET, BQ_TABLE, auditResults).then(() => {
       return res.json(auditResults);
     });
+    return res.json(auditResults);
+  });
 });
 
 app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);
 
+/**
+ * Writes an array of objects into BigQuery
+ * @param {*} datasetName
+ * @param {*} tableName
+ * @param {*} rows
+ */
 async function writeResultStream(datasetName, tableName, rows) {
   const bigqueryClient = new BigQuery();
 
   try {
     await bigqueryClient
-      .dataset(datasetName)
-      .table(tableName)
-      .insert(rows);
-  }catch(e) {
+        .dataset(datasetName)
+        .table(tableName)
+        .insert(rows);
+  } catch (e) {
     console.log(e);
   }
 }

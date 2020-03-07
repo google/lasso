@@ -1,3 +1,4 @@
+
 const {BigQuery} = require('@google-cloud/bigquery');
 const bigquery = new BigQuery();
 
@@ -24,4 +25,3 @@ async function createTable() {
 })().catch(err => {
   console.error(err);
 });
-

@@ -1,6 +1,6 @@
 // Imports the Google Cloud Tasks library.
 const {v2beta3} = require('@google-cloud/tasks');
-const { getChunks } = require('./loader.js');
+const {getChunks} = require('./loader.js');
 
 // Instantiates a client.
 const client = new v2beta3.CloudTasksClient();
@@ -20,7 +20,7 @@ const parent = client.queuePath(project, location, queue);
 
 let inSeconds = 10;
 
-for(var i = 0; i < chunks.length; i++) {
+for (var i = 0; i < chunks.length; i++) {
   let payload = JSON.stringify({"urls":chunks[i]})
   const task = {
     httpRequest: {

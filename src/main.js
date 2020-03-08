@@ -26,9 +26,11 @@ app.post('/', (req, res) => {
 
   lhAudit.run().then((auditResults) => {
     // TODO: Add parameter in URL to make saving to BQ as optional
+
     writeResultStream(BQ_DATASET, BQ_TABLE, auditResults).then(() => {
       return res.json(auditResults);
     });
+
     return res.json(auditResults);
   });
 });

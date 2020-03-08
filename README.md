@@ -32,7 +32,7 @@ compose](https://cloud.google.com/community/tutorials/cloud-run-local-dev-docker
 
 Create a build from the Docker file and create a new tag
 
-`docker build -t aymanfarhat/pagespeed-metrics .`
+`docker build -t <your username>/lasso .`
 
 
 Push the built impage into GCR
@@ -52,6 +52,10 @@ PORT=8080 && docker run \
 ```
 
 Deploy new version on cloud run and update ENV vars
+
+
+### Maintaining code style 
+`sudo npm install -g eslint eslint-config-google`
 
 ### Disclaimer
 This is not an officially supported Google product.

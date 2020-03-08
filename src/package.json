@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node main.js"
+    "start": "nodemon main.js"
   },
   "author": "",
   "license": "Apache",
@@ -18,17 +18,7 @@
   },
   "devDependencies": {
     "eslint": "^6.8.0",
-    "eslint-config-google": "^0.14.0"
-  },
-  "eslintConfig": {
-    "env": {
-        "node": true,
-        "es6": true
-    },
-    "parserOptions": {
-      "ecmaVersion": 2017,
-      "sourceType": "module"
-    },
-    "extends": "google"
+    "eslint-config-google": "^0.14.0",
+    "nodemon": "^2.0.2"
   }
 }

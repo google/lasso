@@ -1,6 +1,6 @@
 # Lasso - Lighthouse at Scale
 
-> A solution build on top of [lighthouse](https://github.com/GoogleChrome/lighthouse#readme) to ease testing large number of URLs at once via Cloud Run, Cloud Tasks and BigQuery.
+> A solution build on top of [lighthouse](https://github.com/GoogleChrome/lighthouse#readme) to automate running Lighthouse tests on large number of URLs in parallel. Utilizes [Cloud Run](https://cloud.google.com/run) and [Cloud Tasks](https://cloud.google.com/tasks) to distribute and run multiple tests in different containers while outputing results to a user defined [BigQuery](https:/= cloud.google.com/bigquery) dataset.
 
 ## Getting started
 

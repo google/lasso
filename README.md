@@ -1,14 +1,10 @@
-# Lasso Lighthouse X Cloud Run
-### Lighthouse At Scale Solution
+# Lasso - Lighthouse at Scale
 
+> A solution build on top of [lighthouse](https://github.com/GoogleChrome/lighthouse#readme) to ease testing large number of URLs at once via Cloud Run, Cloud Tasks and BigQuery.
 
-## Introduction
+## Getting started
 
-An implementation of the lighthouse tool running via puppeteer in Cloud Run.
-
-## Setup Guide
-
-### To Run Locally
+### Running Locally
 
 #### Set Environment Variables
 
@@ -21,23 +17,16 @@ BQ_DATASET and BQ_TABLE in the docker compose cofig.
 
 #### Run via Docker compose
 
-```
-docker-compose up
-```
+For local development, you can choose to run the project via [docker compose](https://cloud.google.com/community/tutorials/cloud-run-local-dev-docker-compose). Running `docker-compose up` launches the service.
 
-[Reference for using docker
-compose](https://cloud.google.com/community/tutorials/cloud-run-local-dev-docker-compose) for local development for Cloud Run
-
-### Deploy to production on CloudRun
+### Deployment via Cloud Run
 
 Create a build from the Docker file and create a new tag
 
 `docker build -t <your username>/lasso .`
 
-
 Push the built impage into GCR
 
-// Command here...
 For running the image locally or on any other server
 
 ```
@@ -52,10 +41,6 @@ PORT=8080 && docker run \
 ```
 
 Deploy new version on cloud run and update ENV vars
-
-
-### Maintaining code style 
-`sudo npm install -g eslint eslint-config-google`
 
 ### Disclaimer
 This is not an officially supported Google product.

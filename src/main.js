@@ -1,15 +1,20 @@
 'use strict';
 
 const express = require('express');
-const {BigQuery} = require('@google-cloud/bigquery');
 const perfConfig = require('./config.performance.js');
 const {LighthouseAudit} = require('./lighthouse-audit');
 const {CloudTasksClient} = require('@google-cloud/tasks');
+const {writeResultStream} = require('./bq-utils');
 
 const PORT = process.env.PORT || 8080;
 const HOST = '0.0.0.0';
+
+const GOOGLE_CLOUD_PROJECT = process.env.GOOGLE_CLOUD_PROJECT;
+const CLOUD_TASKS_QUEUE = process.env.CLOUD_TASKS_QUEUE;
+const CLOUD_TASKS_QUEUE_LOCATION = process.env.CLOUD_TASKS_QUEUE_LOCATION;
 const BQ_DATASET = process.env.BQ_DATASET;
 const BQ_TABLE = process.env.BQ_TABLE;
+const BQ_DATASET_ID = process.env.BQ_DATASET;
 
 const app = express();
 
@@ -17,14 +22,8 @@ app.use(express.raw());
 app.use(express.json({limit: '5mb', extended: true}));
 app.use(express.urlencoded({limit: '5mb', extended: true}));
 
-app.get('/', (req, res) => {
-  const url = `${req.protocol}://${req.headers.host}`;
-  res.send(url);
-});
-
 app.post('/audit', performAudit);
 app.post('/bulk-schedule', scheduleAudits);
-app.get('/create-result-table', createPartitionedTable);
 
 app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);
@@ -62,11 +61,10 @@ async function scheduleAudits(req, res) {
   const chunks = generateUrlChunks(req.body.urls);
   const tasksClient = new CloudTasksClient();
 
-  const project = 'lighthouse-service';
-  const queue = 'lhcrawl';
-  const location = 'europe-west1';
-  // const serviceUrl = `${req.protocol}://${req.headers.host}/bulk-schedule`;
-  const serviceUrl = 'https://lasso-72xe2ajnpq-uc.a.run.app/audit';
+  const project = GOOGLE_CLOUD_PROJECT;
+  const queue = CLOUD_TASKS_QUEUE;
+  const location = CLOUD_TASKS_QUEUE_LOCATION;
+  const serviceUrl = `${req.protocol}://${req.headers.host}/audit`;
   const parent = tasksClient.queuePath(project, location, queue);
 
   let inSeconds = 10;
@@ -113,68 +111,4 @@ function generateUrlChunks(urls) {
   });
 
   return chunks;
-}
-
-/**
- * Writes an array of objects into BigQuery
- * @param {*} datasetName
- * @param {*} tableName
- * @param {*} rows
- */
-async function writeResultStream(datasetName, tableName, rows) {
-  const bigqueryClient = new BigQuery();
-
-  try {
-    await bigqueryClient
-        .dataset(datasetName)
-        .table(tableName)
-        .insert(rows);
-  } catch (e) {
-    console.log(e.errors);
-  }
-}
-
-// Before any create or insert operations: Check if the dataset exists and check if the table exists
-// All this data needs to be checked + any potential exceptions and to be returned back with the API
-
-/**
- * Creates a new BQ Table
- */
-async function createPartitionedTable() {
-  const datasetId = 'lh_results';
-  const tableId = 'sample_set';
-  const schema = `url:string,
-  date:date,
-  firstContentfulPaint:float,
-  largestContentfulPaint:float,
-  firstMeaningfulPaint:float,
-  speedIndex:float,
-  estimatedInputLatency:float,
-  totalBlockingTime:float,
-  maxPotentialFid:float,
-  cumulativeLayoutShift:float,
-  firstCpuIdle:float,
-  interactive:float,
-  serverResponseTime:float`;
-
-  const options = {
-    schema: schema,
-    location: 'US',
-    timePartitioning: {
-      type: 'DAY',
-      expirationMs: '7776000000',
-      field: 'date',
-    },
-  };
-
-  const bigquery = new BigQuery();
-  const [table] = await bigquery
-      .dataset(datasetId)
-      .createTable(tableId, options);
-
-  console.log(`Table ${table.id} created.`);
-}
-
-function checkTableExists() {
- //TODO...
 }

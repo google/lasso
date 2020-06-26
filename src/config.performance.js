@@ -28,6 +28,20 @@ module.exports = {
     'cumulativeLayoutShift': 'cumulative-layout-shift',
     'firstCpuIdle': 'first-cpu-idle',
     'interactive': 'interactive',
-    'serverResponseTime': 'server-response-time'
+    'serverResponseTime': 'server-response-time',
   },
+  bqAuditTableSchema:
+  `url:string,
+  date:date,
+  firstContentfulPaint:float,
+  largestContentfulPaint:float,
+  firstMeaningfulPaint:float,
+  speedIndex:float,
+  estimatedInputLatency:float,
+  totalBlockingTime:float,
+  maxPotentialFid:float,
+  cumulativeLayoutShift:float,
+  firstCpuIdle:float,
+  interactive:float,
+  serverResponseTime:float`,
 };

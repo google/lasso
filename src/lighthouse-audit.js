@@ -2,6 +2,7 @@
 
 const puppeteer = require('puppeteer');
 const lighthouse = require('lighthouse');
+const {BigQuery} = require('@google-cloud/bigquery');
 
 /**
  * Lighthouse Audit
@@ -11,15 +12,18 @@ class LighthouseAudit {
    * Constructor
    * @param {*} urls
    * @param {*} auditConfig
+   * @param {*} auditFieldMapping
    */
-  constructor(urls, auditConfig) {
+  constructor(urls, auditConfig, auditFieldMapping) {
     this.urls = urls;
     this.auditConfig = auditConfig;
     this.auditResults = [];
+    this.auditFieldMapping = auditFieldMapping;
   }
 
   /**
-   * Runs an audit over the selected urls that are set on initialization
+   * Initializes a new puppeteer instance and triggers a set of
+   * LH audits to run sequentially
    * @return {Array}
    */
   async run() {
@@ -33,11 +37,7 @@ class LighthouseAudit {
 
       try {
         const page = await browser.newPage();
-        // We will need to check the page status at some point,
-        // poyentially this step ?
-        let response = await page.goto(url);
-        let metrics = await this.performAudit(url, page);
-
+        const metrics = await this.performAudit(url, page);
         this.auditResults.push(metrics);
       } catch (e) {
         console.log(`${e.message}:(${url})`);
@@ -48,7 +48,7 @@ class LighthouseAudit {
   }
 
   /**
-   * Runs
+   * Runs a lighthouse performance audit on specific page in a chrome instance
    * @param {string} url
    * @param {Object} page
    * @return {Promise}
@@ -56,21 +56,48 @@ class LighthouseAudit {
   async performAudit(url, page) {
     const port = await page.browser().wsEndpoint().split(':')[2].split('/')[0];
 
-    return await lighthouse(page.url(), {port: port}, this.auditConfig)
+    return await lighthouse(url, {port: port}, this.auditConfig)
         .then((metrics) => {
-          return {
-            'url': url,
-            'firstContentFulPaint': metrics.lhr.audits['first-contentful-paint'].rawValue,
-            'firstMeaningFulPaint': metrics.lhr.audits['first-meaningful-paint'].rawValue,
-            'speedIndex': metrics.lhr.audits['speed-index'].rawValue,
-            'estimatedInputLatency': metrics.lhr.audits['estimated-input-latency'].rawValue,
-            'timeToFirstByte': metrics.lhr.audits['time-to-first-byte'].rawValue,
-            'firstCpuIdle': metrics.lhr.audits['first-cpu-idle'].rawValue,
-            'timeToInteractive': metrics.lhr.audits['interactive'].rawValue,
-          };
+          const audits = metrics.lhr.audits;
+
+          if (typeof(audits) != 'undefined' && audits != null) {
+            audits['url'] = url;
+            return audits;
+          }
         }).catch((e) => {
-          console.log(e);
+          throw new Error('Lighthouse audit error');
         });
+  }
+
+  /**
+   * Returns the instance's audit results, properly formatted for
+   * inserting into BigQuery.
+   * @return {Array}
+   */
+  getBQFormatResults() {
+    const today = new Date().toJSON().slice(0, 10);
+    const formattedAudits = this.auditResults.map((audit) => {
+      if (typeof(audit) != 'undefined') {
+        const formattedAudit = Object.entries(this.auditFieldMapping)
+            .reduce((res, keyVal) => {
+              res[keyVal[0]] = audit[keyVal[1]].numericValue;
+              return res;
+            }, {});
+
+        formattedAudit['date'] = BigQuery.date(today);
+        formattedAudit['url'] = audit.url;
+        return formattedAudit;
+      }
+    });
+
+    return formattedAudits;
+  }
+
+  /**
+   * @return {Array}
+   */
+  getRawResults() {
+    return this.auditResults;
   }
 }
 

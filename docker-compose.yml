@@ -1,7 +1,7 @@
 version: '3.3'
 
 services:
-  lh-service:
+  lhservice:
     image: buildkite/puppeteer
     volumes:
         - ./src:/app
@@ -17,5 +17,8 @@ services:
         K_REVISION: 0
         K_CONFIGURATION: lasso
         BQ_DATASET: lh_results
-        BQ_TABLE: psmetrics
+        BQ_TABLE: sample_set
         GOOGLE_APPLICATION_CREDENTIALS: /tmp/keys/gcp-keyfile.json
+        GOOGLE_CLOUD_PROJECT: 'lighthouse-service'
+        CLOUD_TASKS_QUEUE: 'lhcrawl'
+        CLOUD_TASKS_QUEUE_LOCATION: 'europe-west1'

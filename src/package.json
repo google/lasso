@@ -8,13 +8,12 @@
     "start": "nodemon main.js"
   },
   "author": "",
-  "license": "Apache",
+  "license": "Apache-2.0",
   "dependencies": {
-    "@google-cloud/bigquery": "^4.3.0",
-    "@google-cloud/tasks": "^1.5.1",
+    "@google-cloud/bigquery": "^4.7.0",
+    "@google-cloud/tasks": "^2.0.0",
     "express": "^4.17.1",
-    "lighthouse": "^4.3.1",
-    "puppeteer": "^1.15.0"
+    "lighthouse": "^6.0.0"
   },
   "devDependencies": {
     "eslint": "^6.8.0",

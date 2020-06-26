@@ -1,13 +1,9 @@
 // Imports the Google Cloud Tasks library.
-const {v2beta3} = require('@google-cloud/tasks');
+const {CloudTasksClient} = require('@google-cloud/tasks');
 const {getChunks} = require('./loader.js');
 
 // Instantiates a client.
 const client = new v2beta3.CloudTasksClient();
-
-/**
- * TODO: pass those in as command line arguments including the input file
- **/
 
 const project = 'lighthouse-service';
 const queue = 'lhcrawl';
@@ -20,15 +16,15 @@ const parent = client.queuePath(project, location, queue);
 
 let inSeconds = 10;
 
-for (var i = 0; i < chunks.length; i++) {
-  let payload = JSON.stringify({"urls":chunks[i]})
+for (let i = 0; i < chunks.length; i++) {
+  const payload = JSON.stringify({'urls': chunks[i]});
   const task = {
     httpRequest: {
       httpMethod: 'POST',
       url,
-      headers: {"Content-Type": "application/json"},
+      headers: {'Content-Type': 'application/json'},
       body: Buffer.from(payload).toString('base64'),
-      scheduleTime: (inSeconds + (Date.now() / 1000))
+      scheduleTime: (inSeconds + (Date.now() / 1000)),
     },
   };
 

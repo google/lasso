@@ -40,7 +40,7 @@ class LighthouseAudit {
         const metrics = await this.performAudit(url, page);
         this.auditResults.push(metrics);
       } catch (e) {
-        console.log(`${e.message}:(${url})`);
+        throw new Error(`${e.message}:(${url})`);
       }
     }
 
@@ -76,6 +76,7 @@ class LighthouseAudit {
    */
   getBQFormatResults() {
     const today = new Date().toJSON().slice(0, 10);
+
     const formattedAudits = this.auditResults.map((audit) => {
       if (typeof(audit) != 'undefined') {
         const formattedAudit = Object.entries(this.auditFieldMapping)

@@ -5,6 +5,7 @@ const perfConfig = require('./config.performance.js');
 const {LighthouseAudit} = require('./lighthouse-audit');
 const {CloudTasksClient} = require('@google-cloud/tasks');
 const {writeResultStream} = require('./bq-utils');
+const apiUtils = require('./api-utils');
 
 const PORT = process.env.PORT || 8080;
 const HOST = '0.0.0.0';
@@ -41,13 +42,23 @@ async function performAudit(req, res) {
       perfConfig.auditConfig,
       perfConfig.auditResultsMapping);
 
-  await lhAudit.run();
+  try {
+    await lhAudit.run();
+  } catch (e) {
+    res.status(500);
+    return res.json({'error': 'Error running lighthouse'});
+  }
 
-  const results = lhAudit.getBQFormatResults();
 
-  writeResultStream(BQ_DATASET, BQ_TABLE, results).then(() => {
-    return res.json(results);
-  });
+  try {
+    const results = lhAudit.getBQFormatResults();
+    writeResultStream(BQ_DATASET, BQ_TABLE, results).then(() => {
+      return res.json(results);
+    });
+  } catch (e) {
+    res.status(500);
+    return res.json({'error': 'Error running lighthouse'});
+  }
 }
 
 /**
@@ -59,7 +70,7 @@ async function performAudit(req, res) {
  * @return {JSON}
  */
 async function scheduleAudits(req, res) {
-  const chunks = generateUrlChunks(req.body.urls);
+  const chunks = apiUtils.getChunkedList(req.body.urls, 3);
   const tasksClient = new CloudTasksClient();
 
   const project = GOOGLE_CLOUD_PROJECT;
@@ -89,27 +100,4 @@ async function scheduleAudits(req, res) {
   }
 
   return res.json({'chunks': chunks});
-}
-
-/**
- * Splits a large list of strings into equal sized chunks
- * @param {Array} urls
- * @return {Array}
- */
-function generateUrlChunks(urls) {
-  const maxPerChunk = 3;
-  let currentChunk = [];
-  const chunks = [];
-
-  // Split the urls into chunks of size 3
-  urls.forEach(function(item, i) {
-    if (currentChunk.length >= maxPerChunk) {
-      chunks.push(currentChunk);
-      currentChunk = [];
-    }
-
-    currentChunk.push(item);
-  });
-
-  return chunks;
 }

@@ -4,7 +4,7 @@
   "description": "Automate running Lighthouse tests on large number of URLs in parallel",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha",
     "start": "nodemon main.js"
   },
   "author": "Google Inc",
@@ -16,8 +16,10 @@
     "lighthouse": "^6.0.0"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
     "eslint": "^6.8.0",
     "eslint-config-google": "^0.14.0",
+    "mocha": "^8.0.1",
     "nodemon": "^2.0.2"
   }
 }

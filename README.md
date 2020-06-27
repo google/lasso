@@ -4,22 +4,26 @@
 
 ## Getting started
 
-### Running Locally
+### Running Locally via docker compose
 
-#### Set Environment Variables
+#### Setting Environment Variables
 
-Set the path for the Google Cloud credentials as an ENV variable which will get
-picked up by the docker compose config mapped to a volume and set on the running
-container
+Set the path for the Google Cloud credentials of the projecy as an ENV variable in your system on `GCP_KEY_PATH`. This value will be picked up by the docker compose config mapped to a volume and set on the running container. The following ENV variables will need to be configured in docker-compose.yml:
 
-You will also need to make sure to set enviroment variables around the
-BQ_DATASET and BQ_TABLE in the docker compose cofig.
+| ENV var  | Description |
+| ------------- | ------------- |
+| BQ_DATASET  | The name of a BigQuery dataset containing your results table |
+| BQ_TABLE  | The name of the BQ table to output results to |
+| GOOGLE_CLOUD_PROJECT  | ID of your cloud project |
+| CLOUD_TASKS_QUEUE  | Name of your cloud tasks queue |
+| CLOUD_TASKS_QUEUE_LOCATION  | Location of the cloud task queue |
+| SERVICE_URL  | base url and protocol of the deployed service on cloud run |
 
-#### Run via Docker compose
+#### Run 
 
 For local development, you can choose to run the project via [docker compose](https://cloud.google.com/community/tutorials/cloud-run-local-dev-docker-compose). Running `docker-compose up` launches the service.
 
-### Deployment via Cloud Run
+### Deploying to Cloud Run
 
 Create a build from the Docker file and create a new tag
 

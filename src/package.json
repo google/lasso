@@ -1,13 +1,13 @@
 {
   "name": "Lasso",
   "version": "1.0.0",
-  "description": "",
+  "description": "Automate running Lighthouse tests on large number of URLs in parallel",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon main.js"
   },
-  "author": "",
+  "author": "Google Inc",
   "license": "Apache-2.0",
   "dependencies": {
     "@google-cloud/bigquery": "^4.7.0",

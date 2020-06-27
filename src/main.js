@@ -15,6 +15,7 @@ const CLOUD_TASKS_QUEUE_LOCATION = process.env.CLOUD_TASKS_QUEUE_LOCATION;
 const BQ_DATASET = process.env.BQ_DATASET;
 const BQ_TABLE = process.env.BQ_TABLE;
 const BQ_DATASET_ID = process.env.BQ_DATASET;
+const SERVICE_URL = process.env.SERVICE_URL;
 
 const app = express();
 
@@ -64,7 +65,7 @@ async function scheduleAudits(req, res) {
   const project = GOOGLE_CLOUD_PROJECT;
   const queue = CLOUD_TASKS_QUEUE;
   const location = CLOUD_TASKS_QUEUE_LOCATION;
-  const serviceUrl = `${req.protocol}://${req.headers.host}/audit`;
+  const serviceUrl = `${SERVICE_URL}/audit`;
   const parent = tasksClient.queuePath(project, location, queue);
 
   let inSeconds = 10;
@@ -92,7 +93,7 @@ async function scheduleAudits(req, res) {
 
 /**
  * Splits a large list of strings into equal sized chunks
- * @param {*} urls
+ * @param {Array} urls
  * @return {Array}
  */
 function generateUrlChunks(urls) {

@@ -23,9 +23,15 @@ For local development, you can choose to run the project via [docker compose](ht
 
 Create a build from the Docker file and create a new tag
 
-`docker build -t <your username>/lasso .`
+`docker build -t lasso .`
 
-Push the built impage into GCR
+Tag the built image for GCR targeting the cloud project
+
+`docker tag lasso gcr.io/[CLOUD-PROJECT-ID]/lasso:v1`
+
+Push to GCR
+
+`docker push gcr.io/lighthouse-service/lasso:v1`
 
 For running the image locally or on any other server
 

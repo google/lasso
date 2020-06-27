@@ -22,3 +22,4 @@ services:
         GOOGLE_CLOUD_PROJECT: 'lighthouse-service'
         CLOUD_TASKS_QUEUE: 'lhcrawl'
         CLOUD_TASKS_QUEUE_LOCATION: 'europe-west1'
+        SERVICE_URL: 'https://lasso-72xe2ajnpq-uc.a.run.app'

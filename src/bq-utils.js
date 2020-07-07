@@ -58,7 +58,7 @@ async function writeResultStream(datasetName, tableName, rows) {
         .table(tableName)
         .insert(rows);
   } catch (e) {
-    console.log(e.errors);
+    throw new Error(`Error while trying to BigQuery. ${e.message}`);
   }
 }
 

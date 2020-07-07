@@ -23,8 +23,6 @@ const {CloudTasksClient} = require('@google-cloud/tasks');
 const {writeResultStream} = require('./bq-utils');
 const apiUtils = require('./api-utils');
 
-const PORT = process.env.PORT || 8080;
-const HOST = '0.0.0.0';
 
 const GOOGLE_CLOUD_PROJECT = process.env.GOOGLE_CLOUD_PROJECT;
 const CLOUD_TASKS_QUEUE = process.env.CLOUD_TASKS_QUEUE;
@@ -43,8 +41,6 @@ app.use(express.urlencoded({limit: '5mb', extended: true}));
 app.post('/audit', performAudit);
 app.post('/bulk-schedule', scheduleAudits);
 
-app.listen(PORT, HOST);
-console.log(`Running on http://${HOST}:${PORT}`);
 
 /**
  * Performs a lighthouse audit on a set of URLs supplied in the payload
@@ -62,9 +58,13 @@ async function performAudit(req, res) {
     await lhAudit.run();
   } catch (e) {
     res.status(500);
-    return res.json({'error': 'Error running lighthouse'});
+    return res.json({
+      'error': {
+        'code': 500,
+        'message': e.message,
+      },
+    });
   }
-
 
   try {
     const results = lhAudit.getBQFormatResults();
@@ -73,7 +73,12 @@ async function performAudit(req, res) {
     });
   } catch (e) {
     res.status(500);
-    return res.json({'error': 'Error running lighthouse'});
+    return res.json({
+      'error': {
+        'code': 500,
+        'message': e.message,
+      },
+    });
   }
 }
 
@@ -117,3 +122,6 @@ async function scheduleAudits(req, res) {
 
   return res.json({'chunks': chunks});
 }
+
+
+module.exports = app;

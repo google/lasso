@@ -29,7 +29,6 @@ const CLOUD_TASKS_QUEUE = process.env.CLOUD_TASKS_QUEUE;
 const CLOUD_TASKS_QUEUE_LOCATION = process.env.CLOUD_TASKS_QUEUE_LOCATION;
 const BQ_DATASET = process.env.BQ_DATASET;
 const BQ_TABLE = process.env.BQ_TABLE;
-const BQ_DATASET_ID = process.env.BQ_DATASET;
 const SERVICE_URL = process.env.SERVICE_URL;
 
 const app = express();

@@ -37,7 +37,9 @@ Push to GCR
 
 `docker push gcr.io/lighthouse-service/lasso:v1`
 
-For running the image locally or on any other server
+To configure the Cloud Run service, you can follow [this guide](https://cloud.google.com/run/docs/deploying).
+
+### Running the image directly locally or on a server 
 
 ```
 PORT=8080 && docker run \
@@ -49,8 +51,6 @@ PORT=8080 && docker run \
    -v $GOOGLE_APPLICATION_CREDENTIALS:/tmp/keys/lighthouse-service-09c62b8cd84e.json:ro \
    gcr.io/lighthouse-service/pagespeed-metrics
 ```
-
-Deploy new version on cloud run and update ENV vars
 
 ### Disclaimer
 This is not an officially supported Google product.

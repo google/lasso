@@ -52,18 +52,13 @@ async function createDatePartitionTable(datasetId, tableId, schema) {
 async function writeResultStream(datasetName, tableName, rows) {
   const bigqueryClient = new BigQuery();
 
-  try {
-    await bigqueryClient
-        .dataset(datasetName)
-        .table(tableName)
-        .insert(rows);
-  } catch (e) {
-    throw new Error(`Error while trying to BigQuery. ${e.message}`);
-  }
+  return bigqueryClient
+      .dataset(datasetName)
+      .table(tableName)
+      .insert(rows);
 }
 
 module.exports = {
   createDatePartitionTable: createDatePartitionTable,
   writeResultStream: writeResultStream,
 };
-

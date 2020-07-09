@@ -87,14 +87,15 @@ class LighthouseAudit {
 
   /**
    * Returns the instance's audit results, properly formatted for
-   * inserting into BigQuery.
+   * inserting into BigQuery. Columns selected are based on the
+   * auditFileMapping configuration supplied in the constructor.
    * @return {Array}
    */
   getBQFormatResults() {
     const today = new Date().toJSON().slice(0, 10);
-
     const formattedAudits = this.auditResults.map((audit) => {
       if (typeof(audit) != 'undefined') {
+
         const formattedAudit = Object.entries(this.auditFieldMapping)
             .reduce((res, keyVal) => {
               res[keyVal[0]] = audit[keyVal[1]].numericValue;

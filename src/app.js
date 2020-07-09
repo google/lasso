@@ -53,32 +53,20 @@ async function performAudit(req, res) {
       perfConfig.auditConfig,
       perfConfig.auditResultsMapping);
 
-  try {
-    await lhAudit.run();
-  } catch (e) {
-    res.status(500);
-    return res.json({
-      'error': {
-        'code': 500,
-        'message': e.message,
-      },
-    });
-  }
+  await lhAudit.run();
+  const results = lhAudit.getBQFormatResults();
 
-  try {
-    const results = lhAudit.getBQFormatResults();
-    writeResultStream(BQ_DATASET, BQ_TABLE, results).then(() => {
-      return res.json(results);
-    });
-  } catch (e) {
+  writeResultStream(BQ_DATASET, BQ_TABLE, results).then(() => {
+    return res.json(results);
+  }).catch((error) => {
     res.status(500);
     return res.json({
       'error': {
         'code': 500,
-        'message': e.message,
+        'message': error.message,
       },
     });
-  }
+  });
 }
 
 /**

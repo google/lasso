@@ -95,7 +95,6 @@ class LighthouseAudit {
     const today = new Date().toJSON().slice(0, 10);
     const formattedAudits = this.auditResults.map((audit) => {
       if (typeof(audit) != 'undefined') {
-
         const formattedAudit = Object.entries(this.auditFieldMapping)
             .reduce((res, keyVal) => {
               res[keyVal[0]] = audit[keyVal[1]].numericValue;

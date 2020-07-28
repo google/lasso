@@ -17,7 +17,7 @@
 const assert = require('chai').assert;
 const suite = require('mocha').suite;
 const test = require('mocha').test;
-const {getChunkedList} = require('../api-utils');
+const {getChunkedList, validateAuditRequest} = require('../api-utils');
 
 
 suite('getChunkedList tests', () => {
@@ -37,6 +37,64 @@ suite('getChunkedList tests', () => {
   test('Return multiple chunks when input greater than chunk size', () => {
     const expected = [['one', 'two', 'three'], ['four', 'five']];
     const result = getChunkedList(['one', 'two', 'three', 'four', 'five'], 3);
+    assert.deepEqual(result, expected);
+  });
+});
+
+suite('validateAuditSchedule', () => {
+  test('Return error when URL list is not present', () => {
+    const expected = {
+      valid: false,
+      errorMessage: 'URL list not available or empty',
+    };
+    const requestPayload = {'potato': ['one']};
+
+    const result = validateAuditRequest(requestPayload, 10);
+    assert.deepEqual(result, expected);
+  });
+
+  test('Return error when URL list is empty', () => {
+    const expected = {
+      valid: false,
+      errorMessage: 'URL list not available or empty',
+    };
+    const requestPayload = {'urls': []};
+    const result = validateAuditRequest(requestPayload, 10);
+    assert.deepEqual(result, expected);
+  });
+
+  test('Return error when URL list count is greater than a threshold', () => {
+    const maxEntries = '4';
+    const expected = {
+      valid: false,
+      errorMessage: `URL list should not exceed ${maxEntries}`,
+    };
+
+    const requestPayload = {'urls': [
+      'http://one.com',
+      'http://two.com',
+      'http://three.com',
+      'http://four.com',
+      'http://five.com',
+    ]};
+
+    const result = validateAuditRequest(requestPayload, maxEntries);
+    assert.deepEqual(result, expected);
+  });
+
+  test('Return success object when all required tests pass', () => {
+    const expected = {
+      valid: true,
+    };
+
+    const requestPayload = {'urls': [
+      'http://two.com',
+      'http://three.com',
+      'http://four.com',
+      'http://five.com',
+    ]};
+
+    const result = validateAuditRequest(requestPayload, 4);
     assert.deepEqual(result, expected);
   });
 });

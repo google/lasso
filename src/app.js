@@ -21,7 +21,7 @@ const perfConfig = require('./config.performance.js');
 const {LighthouseAudit} = require('./lighthouse-audit');
 const {CloudTasksClient} = require('@google-cloud/tasks');
 const {writeResultStream} = require('./bq-utils');
-const apiUtils = require('./api-utils');
+const {getChunkedList, validateAuditRequest} = require('./api-utils');
 
 
 const GOOGLE_CLOUD_PROJECT = process.env.GOOGLE_CLOUD_PROJECT;
@@ -39,7 +39,6 @@ app.use(express.urlencoded({limit: '5mb', extended: true}));
 
 app.post('/audit', performAudit);
 app.post('/bulk-schedule', scheduleAudits);
-
 
 /**
  * Performs a lighthouse audit on a set of URLs supplied in the payload
@@ -78,36 +77,53 @@ async function performAudit(req, res) {
  * @return {JSON}
  */
 async function scheduleAudits(req, res) {
-  const chunks = apiUtils.getChunkedList(req.body.urls, 3);
-  const tasksClient = new CloudTasksClient();
+  const requestValidation = validateAuditRequest(req.body, 2000);
 
-  const project = GOOGLE_CLOUD_PROJECT;
-  const queue = CLOUD_TASKS_QUEUE;
-  const location = CLOUD_TASKS_QUEUE_LOCATION;
-  const serviceUrl = `${SERVICE_URL}/audit`;
-  const parent = tasksClient.queuePath(project, location, queue);
-
-  let inSeconds = 10;
-
-  for (let i = 0; i < chunks.length; i++) {
-    const payload = JSON.stringify({'urls': chunks[i]});
-    const task = {
-      httpRequest: {
-        httpMethod: 'POST',
-        url: serviceUrl,
-        headers: {'Content-Type': 'application/json'},
-        body: Buffer.from(payload).toString('base64'),
-        scheduleTime: (inSeconds + (Date.now() / 1000)),
+  if (!requestValidation.valid) {
+    res.status(500);
+    return res.json({
+      'error': {
+        'code': 500,
+        'message': requestValidation.errorMessage,
       },
-    };
+    });
+  } else {
+    const chunks = getChunkedList(req.body.urls, 1);
+    const tasksClient = new CloudTasksClient();
 
-    inSeconds += 10;
+    const project = GOOGLE_CLOUD_PROJECT;
+    const queue = CLOUD_TASKS_QUEUE;
+    const location = CLOUD_TASKS_QUEUE_LOCATION;
+    const serviceUrl = `${SERVICE_URL}/audit`;
+    const parent = tasksClient.queuePath(project, location, queue);
 
-    const request = {parent, task};
-    await tasksClient.createTask(request);
+    let inSeconds = 10;
+    const createTasks = [];
+
+    for (let i = 0; i < chunks.length; i++) {
+      const payload = JSON.stringify({'urls': chunks[i]});
+      const task = {
+        httpRequest: {
+          httpMethod: 'POST',
+          url: serviceUrl,
+          headers: {'Content-Type': 'application/json'},
+          body: Buffer.from(payload).toString('base64'),
+          scheduleTime: (inSeconds + (Date.now() / 1000)),
+        },
+      };
+
+      inSeconds += 10;
+
+      const request = {parent, task};
+      const [response] = await tasksClient.createTask(request);
+      createTasks.push({
+        name: response.name,
+        urls: chunks[i],
+      });
+    }
+
+    return res.json({'tasks': createTasks});
   }
-
-  return res.json({'chunks': chunks});
 }
 
 

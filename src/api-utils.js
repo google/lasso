@@ -36,6 +36,34 @@ function getChunkedList(inputList, chunkSize) {
   return chunks;
 }
 
+/**
+ * Simple validation over a requests JSON payload to check for issues
+ * such as size of request, structure etc... Determines the reply and
+ * status code to return back to the calling function.
+ * @param {Object} requestPayload
+ * @param {Object} maxUrlEntries
+ * @return {Object}
+ */
+function validateAuditRequest(requestPayload, maxUrlEntries) {
+  if (typeof (requestPayload.urls) === 'undefined' ||
+    requestPayload.urls.length === 0) {
+    return {
+      valid: false,
+      errorMessage: 'URL list not available or empty',
+    };
+  } else if (requestPayload.urls.length > maxUrlEntries) {
+    return {
+      valid: false,
+      errorMessage: `URL list should not exceed ${maxUrlEntries}`,
+    };
+  } else {
+    return {
+      valid: true,
+    };
+  }
+}
+
 module.exports = {
   getChunkedList,
+  validateAuditRequest,
 };

@@ -5,7 +5,9 @@
 ## Features
 
 ✅ Bulk test 100s of URLs with lighthouse at the same time (A batch of 1000 pages can be tested in around 30 mins)
+
 ✅ Writes test results to a date partitioned BigQuery table
+
 ✅ Optionally specify which resource requests to block from the test e.g. For running tests excluding 3rd party scripts or libraries
 
 ## Getting started

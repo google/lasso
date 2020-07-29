@@ -47,8 +47,10 @@ app.post('/bulk-schedule', scheduleAudits);
  */
 async function performAudit(req, res) {
   const payload = req.body;
+
   const lhAudit = new LighthouseAudit(
       payload.urls,
+      payload.blockedRequests,
       perfConfig.auditConfig,
       perfConfig.auditResultsMapping);
 
@@ -99,9 +101,18 @@ async function scheduleAudits(req, res) {
 
     let inSeconds = 10;
     const createTasks = [];
+    let blockedRequests = [];
+
+    if (typeof req.body.blockedRequests != 'undefined') {
+      blockedRequests = req.body.blockedRequests;
+    }
 
     for (let i = 0; i < chunks.length; i++) {
-      const payload = JSON.stringify({'urls': chunks[i]});
+      const payload = JSON.stringify({
+        'urls': chunks[i],
+        'blockedRequests': blockedRequests,
+      });
+
       const task = {
         httpRequest: {
           httpMethod: 'POST',
@@ -125,6 +136,5 @@ async function scheduleAudits(req, res) {
     return res.json({'tasks': createTasks});
   }
 }
-
 
 module.exports = app;

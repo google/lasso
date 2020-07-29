@@ -59,5 +59,6 @@ module.exports = {
   cumulativeLayoutShift:float,
   firstCpuIdle:float,
   interactive:float,
-  serverResponseTime:float`,
+  serverResponseTime:float,
+  blockedRequests:string`,
 };

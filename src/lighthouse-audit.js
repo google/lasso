@@ -26,12 +26,14 @@ const {BigQuery} = require('@google-cloud/bigquery');
 class LighthouseAudit {
   /**
    * Constructor
-   * @param {*} urls
-   * @param {*} auditConfig
-   * @param {*} auditFieldMapping
+   * @param {Array} urls
+   * @param {Array} blockedRequestPatterns
+   * @param {Object} auditConfig
+   * @param {Object} auditFieldMapping
    */
-  constructor(urls, auditConfig, auditFieldMapping) {
+  constructor(urls, blockedRequestPatterns = [], auditConfig, auditFieldMapping) {
     this.urls = urls;
+    this.blockedRequestPatterns = blockedRequestPatterns;
     this.auditConfig = auditConfig;
     this.auditResults = [];
     this.auditFieldMapping = auditFieldMapping;
@@ -53,7 +55,7 @@ class LighthouseAudit {
 
       try {
         const page = await browser.newPage();
-        const metrics = await this.performAudit(url, page);
+        const metrics = await this.performAudit(url, page, this.blockedRequestPatterns);
         this.auditResults.push(metrics);
       } catch (e) {
         throw new Error(`${e.message}:(${url})`);
@@ -67,12 +69,17 @@ class LighthouseAudit {
    * Runs a lighthouse performance audit on specific page in a chrome instance
    * @param {string} url
    * @param {Object} page
+   * @param {Array} blockedUrlPatterns
    * @return {Promise}
    */
-  async performAudit(url, page) {
+  async performAudit(url, page, blockedUrlPatterns) {
     const port = await page.browser().wsEndpoint().split(':')[2].split('/')[0];
+    const options = {
+      blockedUrlPatterns,
+      port,
+    };
 
-    return await lighthouse(url, {port: port}, this.auditConfig)
+    return await lighthouse(url, options, this.auditConfig)
         .then((metrics) => {
           const audits = metrics.lhr.audits;
 
@@ -103,6 +110,8 @@ class LighthouseAudit {
 
         formattedAudit['date'] = BigQuery.date(today);
         formattedAudit['url'] = audit.url;
+        formattedAudit['blockedRequests'] = this.blockedRequestPatterns.join(',');
+
         return formattedAudit;
       }
     });

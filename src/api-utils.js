@@ -40,6 +40,7 @@ function getChunkedList(inputList, chunkSize) {
  * Simple validation over a requests JSON payload to check for issues
  * such as size of request, structure etc... Determines the reply and
  * status code to return back to the calling function.
+ * Note: To be moved to a proper middleware later
  * @param {Object} requestPayload
  * @param {Object} maxUrlEntries
  * @return {Object}

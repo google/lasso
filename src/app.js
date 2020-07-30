@@ -23,14 +23,6 @@ const {CloudTasksClient} = require('@google-cloud/tasks');
 const {writeResultStream} = require('./bq-utils');
 const {getChunkedList, validateAuditRequest} = require('./api-utils');
 
-
-const GOOGLE_CLOUD_PROJECT = process.env.GOOGLE_CLOUD_PROJECT;
-const CLOUD_TASKS_QUEUE = process.env.CLOUD_TASKS_QUEUE;
-const CLOUD_TASKS_QUEUE_LOCATION = process.env.CLOUD_TASKS_QUEUE_LOCATION;
-const BQ_DATASET = process.env.BQ_DATASET;
-const BQ_TABLE = process.env.BQ_TABLE;
-const SERVICE_URL = process.env.SERVICE_URL;
-
 const app = express();
 
 app.use(express.raw());
@@ -46,6 +38,9 @@ app.post('/bulk-schedule', scheduleAudits);
  * @param {*} res
  */
 async function performAudit(req, res) {
+  const BQ_DATASET = process.env.BQ_DATASET;
+  const BQ_TABLE = process.env.BQ_TABLE;
+
   const payload = req.body;
 
   const lhAudit = new LighthouseAudit(
@@ -79,6 +74,11 @@ async function performAudit(req, res) {
  * @return {JSON}
  */
 async function scheduleAudits(req, res) {
+  const GOOGLE_CLOUD_PROJECT = process.env.GOOGLE_CLOUD_PROJECT;
+  const CLOUD_TASKS_QUEUE = process.env.CLOUD_TASKS_QUEUE;
+  const CLOUD_TASKS_QUEUE_LOCATION = process.env.CLOUD_TASKS_QUEUE_LOCATION;
+  const SERVICE_URL = process.env.SERVICE_URL;
+
   const requestValidation = validateAuditRequest(req.body, 2000);
 
   if (!requestValidation.valid) {
@@ -92,12 +92,13 @@ async function scheduleAudits(req, res) {
   } else {
     const chunks = getChunkedList(req.body.urls, 1);
     const tasksClient = new CloudTasksClient();
-
-    const project = GOOGLE_CLOUD_PROJECT;
-    const queue = CLOUD_TASKS_QUEUE;
-    const location = CLOUD_TASKS_QUEUE_LOCATION;
     const serviceUrl = `${SERVICE_URL}/audit`;
-    const parent = tasksClient.queuePath(project, location, queue);
+
+    const parent = tasksClient.queuePath(
+        GOOGLE_CLOUD_PROJECT,
+        CLOUD_TASKS_QUEUE_LOCATION,
+        CLOUD_TASKS_QUEUE,
+    );
 
     let inSeconds = 10;
     const createTasks = [];

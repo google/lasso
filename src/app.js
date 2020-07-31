@@ -31,6 +31,7 @@ app.use(express.urlencoded({limit: '5mb', extended: true}));
 
 app.post('/audit', performAudit);
 app.post('/bulk-schedule', scheduleAudits);
+app.get('/active-tasks', getActiveTasks);
 
 /**
  * Performs a lighthouse audit on a set of URLs supplied in the payload
@@ -136,6 +137,31 @@ async function scheduleAudits(req, res) {
 
     return res.json({'tasks': createTasks});
   }
+}
+
+/**
+ * Lists all the tasks that are currently active
+ * @param {*} req
+ * @param {*} res
+ * @return {JSON}
+ */
+async function getActiveTasks(req, res) {
+  const GOOGLE_CLOUD_PROJECT = process.env.GOOGLE_CLOUD_PROJECT;
+  const CLOUD_TASKS_QUEUE = process.env.CLOUD_TASKS_QUEUE;
+  const CLOUD_TASKS_QUEUE_LOCATION = process.env.CLOUD_TASKS_QUEUE_LOCATION;
+  const tasksClient = new CloudTasksClient();
+
+  const parent = tasksClient.queuePath(
+      GOOGLE_CLOUD_PROJECT,
+      CLOUD_TASKS_QUEUE_LOCATION,
+      CLOUD_TASKS_QUEUE,
+  );
+
+  const tasks = await tasksClient.listTasks({
+    parent,
+  });
+
+  res.json(tasks);
 }
 
 module.exports = app;

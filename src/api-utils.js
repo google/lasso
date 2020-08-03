@@ -64,7 +64,20 @@ function validateAuditRequest(requestPayload, maxUrlEntries) {
   }
 }
 
+/**
+ * Converts a base 64 object buffer into a plain object
+ * @param {Buffer} objectData
+ * @return {String}
+ */
+function objectFromBuffer(objectData) {
+  const buff = new Buffer(objectData, 'base64');
+  const parsedObj = JSON.parse(buff.toString('ascii'));
+
+  return parsedObj;
+}
+
 module.exports = {
   getChunkedList,
   validateAuditRequest,
+  objectFromBuffer,
 };

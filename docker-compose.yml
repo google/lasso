@@ -2,7 +2,7 @@ version: '3.3'
 
 services:
   lhservice:
-    image: buildkite/puppeteer
+    image: buildkite/puppeteer:latest
     volumes:
         - ./src:/app
         - ${GCP_KEY_PATH}:/tmp/keys/gcp-keyfile.json:ro

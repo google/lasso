@@ -21,7 +21,7 @@ const perfConfig = require('./config.performance.js');
 const {LighthouseAudit} = require('./lighthouse-audit');
 const {CloudTasksClient} = require('@google-cloud/tasks');
 const {writeResultStream} = require('./bq-utils');
-const {getChunkedList, validateAuditRequest} = require('./api-utils');
+const {getChunkedList, validateAuditRequest, objectFromBuffer} = require('./api-utils');
 
 const app = express();
 
@@ -157,11 +157,37 @@ async function getActiveTasks(req, res) {
       CLOUD_TASKS_QUEUE,
   );
 
-  const tasks = await tasksClient.listTasks({
+  const activeTasks = await tasksClient.listTasks({
     parent,
-  });
+    responseView: 'FULL',
+    pageSize: parseInt(req.query.pageSize) || 100,
+    pageToken: req.query.pageToken || null,
+  }, {
+    autoPaginate: false,
+  },
+  );
 
-  res.json(tasks);
+  const tasksResults = {
+    tasks: [],
+    nextPageToken: null,
+  };
+
+  if (activeTasks[2] != undefined && activeTasks[2] != null) {
+    tasksResults.tasks = activeTasks[2]['tasks'].map((taskItem) => {
+      return {
+        name: taskItem.name,
+        data: objectFromBuffer(taskItem.httpRequest.body),
+        dispatchCount: taskItem.dispatchCount,
+        responseCount: taskItem.responseCount,
+        firstAttempt: taskItem.firstAttempt,
+        lastAttempt: taskItem.lastAttempt,
+      };
+    });
+
+    tasksResults.nextPageToken = activeTasks[2]['nextPageToken'];
+  }
+
+  res.json(tasksResults);
 }
 
 module.exports = app;

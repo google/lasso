@@ -17,7 +17,7 @@
 const assert = require('chai').assert;
 const suite = require('mocha').suite;
 const test = require('mocha').test;
-const {getChunkedList, validateAuditRequest} = require('../api-utils');
+const {getChunkedList, validateAuditRequest} = require('../utils/api');
 
 
 suite('getChunkedList tests', () => {

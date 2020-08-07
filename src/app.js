@@ -20,8 +20,8 @@ const express = require('express');
 const perfConfig = require('./config.performance.js');
 const {LighthouseAudit} = require('./lighthouse-audit');
 const {CloudTasksClient} = require('@google-cloud/tasks');
-const {writeResultStream} = require('./bq-utils');
-const {getChunkedList, validateAuditRequest, objectFromBuffer} = require('./api-utils');
+const {writeResultStream} = require('./utils/bq');
+const {getChunkedList, validateAuditRequest, objectFromBuffer} = require('./utils/api');
 
 const app = express();
 

@@ -1,14 +1,14 @@
-# Lasso - Lighthouse at Scale
+# Lasso - Lighthouse as a service
 
 > An API service built on top of [lighthouse](https://github.com/GoogleChrome/lighthouse#readme) to automate running Lighthouse tests on large number of URLs in parallel. Utilizes [Cloud Run](https://cloud.google.com/run) and [Cloud Tasks](https://cloud.google.com/tasks) to distribute and run multiple tests across multiple containers, outputs results to a [BigQuery](https://cloud.google.com/bigquery) dataset.
 
 ## Features
 
-✅ Bulk test 100s of URLs with lighthouse simultaneously (On average, 1000 pages can be processed in around 30 mins)
+✅ Bulk test 100s of URLs with lighthouse asynchronously
 
 ✅ Writes test results to a date partitioned BigQuery table
 
-✅ Optionally specify which resource requests to block from the test e.g. For running tests excluding 3rd party scripts or libraries
+✅ Specify which resource requests to block from tests e.g. For running tests excluding 3rd party scripts or libraries
 
 ## Setup
 
@@ -54,11 +54,11 @@ Set the path for the Google Cloud credentials of the project as an ENV variable 
 | CLOUD_TASKS_QUEUE_LOCATION  | Location of the cloud task queue |
 | SERVICE_URL  | base url and protocol of the deployed service on cloud run |
 
-#### Run 
+#### Run
 
 For local development, you can choose to run the project via [docker compose](https://cloud.google.com/community/tutorials/cloud-run-local-dev-docker-compose). Running `docker-compose up` launches the service.
 
-### Running the image directly locally or on a server 
+### Running the image directly locally or on a server
 
 ```
 PORT=8080 && docker run \
@@ -72,6 +72,26 @@ PORT=8080 && docker run \
 ```
 
 ## Using the service API
+
+### Running audits sequentially
+
+```
+curl -X POST \
+  http://127.0.0.1:8080/audit \
+  -H 'content-type: application/json' \
+  -d '{
+  "urls": [
+    "https://www.exampleurl1.com",
+    "https://www.exampleurl1.com",
+    ...
+    ]
+  }'
+```
+
+### Scheduling async audits
+WIP
+
+### Listing active tasks
 WIP
 
 ## Disclaimer

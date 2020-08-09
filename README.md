@@ -97,10 +97,10 @@ curl -X POST \
   }'
 ```
 
-### Scheduling async audits
+### /bulk-schedule - Schedules new async audits
 WIP
 
-### Listing active tasks
+### /active-tasks - Lists active async audit tasks
 WIP
 
 ## Disclaimer

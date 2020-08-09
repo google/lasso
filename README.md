@@ -20,11 +20,11 @@ Create a build from the Docker file and create a new tag
 
 Tag the built image for GCR targeting the cloud project
 
-`docker tag lasso gcr.io/[CLOUD-PROJECT-ID]/lasso:v1`
+`docker tag lasso gcr.io/[CLOUD-PROJECT-ID]/lasso:[TAG]`
 
 Push to GCR (Make sure the GCR API is [enabled](https://console.cloud.google.com/apis/api/containerregistry.googleapis.com/overview?project=lasso-285806) already)
 
-`docker push gcr.io/[CLOUD-PROJECT-ID]/lasso:v1`
+`docker push gcr.io/[CLOUD-PROJECT-ID]/lasso:[TAG]`
 
 To learn more about configuring a Cloud Run service, you can follow [this guide](https://cloud.google.com/run/docs/deploying). 
 
@@ -73,7 +73,9 @@ PORT=8080 && docker run \
 
 ## Using the service API
 
-### /audit - Runs multiple audits sequentially
+### /audit 
+
+Runs one or more audits sequentially, utilizing a shared puppeteer instance between tests. Logs results to the configured BQ dataset table.
 
 **Parameters**
 
@@ -93,15 +95,24 @@ curl -X POST \
     "https://www.exampleurl1.com",
     "https://www.exampleurl1.com",
     ...
+    ],
+  "blockedRequests": [
+    "https://www.someblockedrequestdomain.com"
     ]
   }'
 ```
 
-### /bulk-schedule - Schedules new async audits
-WIP
+### /bulk-schedule
 
-### /active-tasks - Lists active async audit tasks
-WIP
+Schedules one or more audits to run asynchronously, utilizing [Cloud Tasks](https://cloud.google.com/tasks). Each dispatched task calls `/audit` as a target to run and log the test.
+
+(More details WIP)
+
+### /active-tasks
+
+Lists all the active audit tasks that are in queue along with the payload and status
+
+(More details WIP)
 
 ## Disclaimer
 This is not an officially supported Google product.

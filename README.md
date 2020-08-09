@@ -73,7 +73,16 @@ PORT=8080 && docker run \
 
 ## Using the service API
 
-### Running audits sequentially
+### /audit - Runs multiple audits sequentially
+
+**Parameters**
+
+| Name | Type | Optional | Description
+| ------------- | ------------- | ------------- | ------------- |
+| urls  | Array | | List of urls to run a lighthouse audit on |
+| blockedRequests  | Array | Yes | List of requests to block on each audit e.g. 3rd party tag origins |
+
+**Example**
 
 ```
 curl -X POST \

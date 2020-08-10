@@ -21,7 +21,11 @@ const perfConfig = require('./config.performance.js');
 const {LighthouseAudit} = require('./lighthouse-audit');
 const {CloudTasksClient} = require('@google-cloud/tasks');
 const {writeResultStream} = require('./utils/bq');
-const {getChunkedList, validateAuditRequest, objectFromBuffer} = require('./utils/api');
+const {getChunkedList, objectFromBuffer} = require('./utils/api');
+const {
+  auditRequestValidation,
+  asyncAuditRequestValidation,
+  activeTasksRequestValidation} = require('./utils/validate');
 
 const app = express();
 
@@ -29,14 +33,14 @@ app.use(express.raw());
 app.use(express.json({limit: '5mb', extended: true}));
 app.use(express.urlencoded({limit: '5mb', extended: true}));
 
-app.post('/audit', performAudit);
-app.post('/bulk-schedule', scheduleAudits);
-app.get('/active-tasks', getActiveTasks);
+app.post('/audit', auditRequestValidation, performAudit);
+app.post('/audit-async', asyncAuditRequestValidation, scheduleAudits);
+app.get('/active-tasks', activeTasksRequestValidation, getActiveTasks);
 
 /**
  * Performs a lighthouse audit on a set of URLs supplied in the payload
- * @param {*} req
- * @param {*} res
+ * @param {Object} req
+ * @param {Object} res
  */
 async function performAudit(req, res) {
   const BQ_DATASET = process.env.BQ_DATASET;
@@ -70,8 +74,8 @@ async function performAudit(req, res) {
  * Divides a set of URLs in the payload to equal sized chunks and push
  * them into cloud tasks to run be run as async. The cloud tasks use
  * the /audit endpoint to run each smaller set of audits.
- * @param {*} req
- * @param {*} res
+ * @param {Object} req
+ * @param {Object} res
  * @return {JSON}
  */
 async function scheduleAudits(req, res) {
@@ -80,69 +84,57 @@ async function scheduleAudits(req, res) {
   const CLOUD_TASKS_QUEUE_LOCATION = process.env.CLOUD_TASKS_QUEUE_LOCATION;
   const SERVICE_URL = process.env.SERVICE_URL;
 
-  const requestValidation = validateAuditRequest(req.body, 2000);
+  const chunks = getChunkedList(req.body.urls, 1);
+  const tasksClient = new CloudTasksClient();
+  const serviceUrl = `${SERVICE_URL}/audit`;
 
-  if (!requestValidation.valid) {
-    res.status(500);
-    return res.json({
-      'error': {
-        'code': 500,
-        'message': requestValidation.errorMessage,
-      },
-    });
-  } else {
-    const chunks = getChunkedList(req.body.urls, 1);
-    const tasksClient = new CloudTasksClient();
-    const serviceUrl = `${SERVICE_URL}/audit`;
+  const parent = tasksClient.queuePath(
+      GOOGLE_CLOUD_PROJECT,
+      CLOUD_TASKS_QUEUE_LOCATION,
+      CLOUD_TASKS_QUEUE,
+  );
 
-    const parent = tasksClient.queuePath(
-        GOOGLE_CLOUD_PROJECT,
-        CLOUD_TASKS_QUEUE_LOCATION,
-        CLOUD_TASKS_QUEUE,
-    );
+  let inSeconds = 10;
+  const createTasks = [];
+  let blockedRequests = [];
 
-    let inSeconds = 10;
-    const createTasks = [];
-    let blockedRequests = [];
-
-    if (typeof req.body.blockedRequests != 'undefined') {
-      blockedRequests = req.body.blockedRequests;
-    }
-
-    for (let i = 0; i < chunks.length; i++) {
-      const payload = JSON.stringify({
-        'urls': chunks[i],
-        'blockedRequests': blockedRequests,
-      });
-
-      const task = {
-        httpRequest: {
-          httpMethod: 'POST',
-          url: serviceUrl,
-          headers: {'Content-Type': 'application/json'},
-          body: Buffer.from(payload).toString('base64'),
-          scheduleTime: (inSeconds + (Date.now() / 1000)),
-        },
-      };
-
-      inSeconds += 10;
-
-      const request = {parent, task};
-      const [response] = await tasksClient.createTask(request);
-      createTasks.push({
-        name: response.name,
-        urls: chunks[i],
-      });
-    }
-
-    return res.json({'tasks': createTasks});
+  if (typeof req.body.blockedRequests != 'undefined') {
+    blockedRequests = req.body.blockedRequests;
   }
+
+  for (let i = 0; i < chunks.length; i++) {
+    const payload = JSON.stringify({
+      'urls': chunks[i],
+      'blockedRequests': blockedRequests,
+    });
+
+    const task = {
+      httpRequest: {
+        httpMethod: 'POST',
+        url: serviceUrl,
+        headers: {'Content-Type': 'application/json'},
+        body: Buffer.from(payload).toString('base64'),
+        scheduleTime: (inSeconds + (Date.now() / 1000)),
+      },
+    };
+
+    inSeconds += 10;
+
+    const request = {parent, task};
+    const [response] = await tasksClient.createTask(request);
+    createTasks.push({
+      name: response.name,
+      urls: chunks[i],
+    });
+  }
+
+  return res.json({'tasks': createTasks});
 }
 
 /**
  * Lists all the tasks that are currently active
- * @param {*} req
- * @param {*} res
+ * @param {Object} req
+ * @param {Object} res
  * @return {JSON}
  */
 async function getActiveTasks(req, res) {
@@ -189,5 +181,10 @@ async function getActiveTasks(req, res) {
 
   res.json(tasksResults);
 }
+
+app.use(function(err, req, res, next) {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
 
 module.exports = app;

@@ -1,0 +1,242 @@
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+html,body{
+  height:100%;
+  min-height:100%;
+  line-height: 1;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  font-family: 'Roboto', sans-serif;
+  line-height: 1;
+  color: rgba(0,0,0,0.87);
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  display: grid;
+  grid-gap: 1rem;
+  color: #fff;
+  margin: 0;
+  padding:10px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  color: rgba(0,0,0,.54);
+}
+
+header h1 {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.fork-btn {
+  display: flex;
+  align-items: center;
+}
+
+.fork-btn a {
+  color: #FFF;
+  padding:5px;
+  text-decoration: none;
+}
+
+.main-wrapper {
+  display: grid;
+  grid-template-rows: fit-content(10%) fit-content(10%) auto;
+  flex-grow: 1;
+  height: 100vh;
+}
+
+.panels-wrapper {
+  display: grid;
+  grid-template-columns: 30% 70%;
+  height: 100%;
+	min-height: 80vh;
+}
+
+.panel-content {
+	padding: 2em;
+}
+
+.c-input {
+  border-right: 1px solid #bebebe;
+  color: #000;
+  background-color: #FFF;
+}
+
+.c-output {
+  padding: 0;
+  color: #000;
+  background-color: #FFF;
+}
+
+.toolbar {
+  color: #fff;
+  box-sizing: border-box;
+  padding: 10px;
+  background: #4285f4;
+	text-align: center;
+}
+
+form input[type], form select, form textarea {
+    margin-bottom: 1em;
+}
+
+input[type=email], input[type=month], input[type=number], input[type=password], input[type=search], input[type=tel], input[type=text], input[type=time], input[type=url], input[type=week], input[type^=date] {
+    outline: 0;
+    box-sizing: border-box;
+    height: 2em;
+    margin: 0;
+    padding: calc(.25em - 1px) .5em;
+    font-family: inherit;
+    font-size: 1em;
+    border: 1px solid #aaa;
+    border-radius: 2px;
+    background: #fff;
+    color: #000;
+    display: block;
+    width: 100%;
+    line-height: calc(2em - 1px*2 - (.25em - 1px)*2);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+input[type=button], input[type=reset], input[type=submit] {
+    outline: 0;
+    box-sizing: border-box;
+    height: 2em;
+    margin: 0;
+    padding: calc(.25em - 1px) .5em;
+    font-family: inherit;
+    font-size: 1em;
+    border: 1px solid #aaa;
+    border-radius: 2px;
+    display: inline-block;
+    width: auto;
+    background-color: #3367d6;
+    box-shadow: none;
+    color: #FFF;
+    cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+input[type=file] {
+    outline: 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: calc(.25em - 1px) .5em;
+    font-family: inherit;
+    border: 1px solid #aaa;
+    border-radius: 2px;
+    background: #fff;
+    background: #f2f2f2;
+    color: #000;
+    cursor: pointer;
+    display: block;
+    width: 100%;
+    height: auto;
+    padding: .75em .5em;
+    font-size: 12px;
+    line-height: 1;
+}
+
+table {
+    display: inline-block;
+    border-spacing: 0;
+    border-collapse: collapse;
+    overflow-x: auto;
+    max-width: 100%;
+    text-align: left;
+    vertical-align: top;
+    background: linear-gradient(rgba(0,0,0,.15) 0%,rgba(0,0,0,.15) 100%) 0 0,linear-gradient(rgba(0,0,0,.15) 0%,rgba(0,0,0,.15) 100%) 100% 0;
+    background-attachment: scroll,scroll;
+    background-size: 1px 100%,1px 100%;
+    background-repeat: no-repeat,no-repeat;
+}
+
+table td:first-child, table th:first-child {
+    padding-left: 0;
+    background-image: linear-gradient(to right,#fff 50%,rgba(255,255,255,0) 100%);
+    background-size: 2px 100%;
+    background-repeat: no-repeat;
+}
+
+table td, table th {
+    padding: .35em .75em;
+    vertical-align: top;
+    font-size: .9em;
+    border: 1px solid #f2f2f2;
+    border-top: 0;
+    border-left: 0;
+}
+
+table th {
+    line-height: 1.2;
+}
+
+textarea {
+    outline: 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: calc(.25em - 1px) .5em;
+    font-family: inherit;
+    font-size: 1em;
+    border: 1px solid #aaa;
+    border-radius: 2px;
+    background: #fff;
+    color: #000;
+    display: block;
+    width: 100%;
+    line-height: calc(2em - 1px*2 - (.25em - 1px)*2);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    height: 4.5em;
+    resize: vertical;
+    padding-top: .5em;
+    padding-bottom: .5em;
+}
+
+button:focus, input[type=email]:focus, input[type=month]:focus, input[type=number]:focus, input[type=password]:focus, input[type=search]:focus, input[type=tel]:focus, input[type=text]:focus, input[type=time]:focus, input[type=url]:focus, input[type=week]:focus, input[type^=date]:focus, select:focus, textarea:focus {
+    border: 1px solid #4285f4;
+}
+
+details, nav, p {
+    margin: 1em 0;
+}
+
+form label:not(:first-child) {
+    margin-top: 1em;
+}
+form label, form select, output {
+    display: block;
+}

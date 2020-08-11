@@ -16,6 +16,7 @@
 
 'use strict';
 
+const path = require('path');
 const express = require('express');
 const perfConfig = require('./config.performance.js');
 const {LighthouseAudit} = require('./lighthouse-audit');
@@ -32,6 +33,12 @@ const app = express();
 app.use(express.raw());
 app.use(express.json({limit: '5mb', extended: true}));
 app.use(express.urlencoded({limit: '5mb', extended: true}));
+
+app.use(express.static('client'));
+
+app.get('/', function(req, res) {
+  res.sendFile(path.join(__dirname + '/client/index.html'));
+});
 
 app.post('/audit', auditRequestValidation, performAudit);
 app.post('/audit-async', asyncAuditRequestValidation, scheduleAudits);

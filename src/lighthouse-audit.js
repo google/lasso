@@ -58,7 +58,7 @@ class LighthouseAudit {
         const metrics = await this.performAudit(url, page, this.blockedRequestPatterns);
         this.auditResults.push(metrics);
       } catch (e) {
-        throw new Error(`${e.message}:(${url})`);
+        throw new Error(`${e.message} on ${url}`);
       }
     }
 
@@ -88,7 +88,7 @@ class LighthouseAudit {
             return audits;
           }
         }).catch((e) => {
-          throw new Error('Lighthouse audit error');
+          throw new Error(`LH Audit error: ${e.message}`);
         });
   }
 

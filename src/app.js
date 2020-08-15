@@ -61,7 +61,18 @@ async function performAudit(req, res) {
       perfConfig.auditConfig,
       perfConfig.auditResultsMapping);
 
-  await lhAudit.run();
+  try {
+    await lhAudit.run();
+  } catch (e) {
+    res.status(500);
+    return res.json({
+      'error': {
+        'code': 500,
+        'message': e.message,
+      },
+    });
+  }
+
   const results = lhAudit.getBQFormatResults();
 
   writeResultStream(BQ_DATASET, BQ_TABLE, results).then(() => {

@@ -52,7 +52,6 @@ app.get('/active-tasks', activeTasksRequestValidation, getActiveTasks);
 async function performAudit(req, res) {
   const BQ_DATASET = process.env.BQ_DATASET;
   const BQ_TABLE = process.env.BQ_TABLE;
-
   const payload = req.body;
 
   const lhAudit = new LighthouseAudit(
@@ -63,6 +62,10 @@ async function performAudit(req, res) {
 
   try {
     await lhAudit.run();
+    const results = lhAudit.getBQFormatResults();
+    await writeResultStream(BQ_DATASET, BQ_TABLE, results);
+
+    return res.json(results);
   } catch (e) {
     res.status(500);
     return res.json({
@@ -72,20 +75,6 @@ async function performAudit(req, res) {
       },
     });
   }
-
-  const results = lhAudit.getBQFormatResults();
-
-  writeResultStream(BQ_DATASET, BQ_TABLE, results).then(() => {
-    return res.json(results);
-  }).catch((error) => {
-    res.status(500);
-    return res.json({
-      'error': {
-        'code': 500,
-        'message': error.message,
-      },
-    });
-  });
 }
 
 /**

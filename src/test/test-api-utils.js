@@ -39,6 +39,15 @@ suite('getChunkedList tests', () => {
     const result = getChunkedList(['one', 'two', 'three', 'four', 'five'], 3);
     assert.deepEqual(result, expected);
   });
+
+  test('Filter out values in the input list based on a filter callback', () => {
+    const isEvenNum = (x) => x % 2 != 0;
+    const expected = [[1, 3, 5], [7, 9]];
+    const result = getChunkedList([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 3, isEvenNum);
+
+    assert.deepEqual(result, expected);
+  });
+
 });
 
 suite('validateAuditSchedule', () => {

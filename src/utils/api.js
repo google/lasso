@@ -18,11 +18,16 @@
  * Transforms an array into multiple chunks of a specific size
  * @param {Array} inputList
  * @param {Integer} chunkSize
+ * @param {Function} filterCallback
  * @return {Array}
  */
-function getChunkedList(inputList, chunkSize) {
+function getChunkedList(inputList, chunkSize, filterCallback = null) {
   let currentChunk = [];
   const chunks = [];
+
+  if (typeof filterCallback === 'function') {
+    inputList = inputList.filter(filterCallback);
+  }
 
   inputList.forEach((item, i) => {
     currentChunk.push(item);

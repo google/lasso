@@ -35,8 +35,7 @@ class AuditForm extends Component {
    */
   submitTasksRequest(formData) {
     const requestObject = {};
-    const urlList = formData['urlsTxt'].split('\n');
-    requestObject['urls'] = urlList;
+    requestObject['urls'] = formData['urlsTxt'].split('\n');
 
     this.postData('/audit-async', requestObject)
         .then((data) => {

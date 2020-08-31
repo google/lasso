@@ -61,7 +61,7 @@ function processTaskResults(taskList) {
     nextPageToken: null,
   };
 
-  if (taskList != undefined && taskList != null) {
+  if (taskList !== undefined && taskList != null) {
     tasksResults.tasks = taskList['tasks'].map((taskItem) => {
       return {
         name: taskItem.name,

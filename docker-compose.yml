@@ -20,6 +20,6 @@ services:
         BQ_TABLE: lh_set
         GOOGLE_APPLICATION_CREDENTIALS: /tmp/keys/gcp-keyfile.json
         GOOGLE_CLOUD_PROJECT: 'lighthouse-service'
-        CLOUD_TASKS_QUEUE: 'lhcrawl'
+        CLOUD_TASKS_QUEUE: 'lhtests'
         CLOUD_TASKS_QUEUE_LOCATION: 'europe-west1'
         SERVICE_URL: ${SERVICE_URL}

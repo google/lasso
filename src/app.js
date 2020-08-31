@@ -22,7 +22,7 @@ const perfConfig = require('./config.performance.js');
 const {LighthouseAudit} = require('./lighthouse-audit');
 const {CloudTasksClient} = require('@google-cloud/tasks');
 const {writeResultStream} = require('./utils/bq');
-const {getChunkedList} = require('./utils/api');
+const {getChunkedList, isURL} = require('./utils/api');
 const {listActiveTasks, processTaskResults} = require('./utils/tasks');
 const {
   auditRequestValidation,
@@ -92,7 +92,7 @@ async function scheduleAudits(req, res) {
   const CLOUD_TASKS_QUEUE_LOCATION = process.env.CLOUD_TASKS_QUEUE_LOCATION;
   const SERVICE_URL = process.env.SERVICE_URL;
 
-  const chunks = getChunkedList(req.body.urls, 1);
+  const chunks = getChunkedList(req.body.urls, 1, isURL);
   const tasksClient = new CloudTasksClient();
   const serviceUrl = `${SERVICE_URL}/audit`;
 

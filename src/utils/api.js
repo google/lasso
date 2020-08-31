@@ -18,11 +18,16 @@
  * Transforms an array into multiple chunks of a specific size
  * @param {Array} inputList
  * @param {Integer} chunkSize
+ * @param {Function} filterCallback
  * @return {Array}
  */
-function getChunkedList(inputList, chunkSize) {
+function getChunkedList(inputList, chunkSize, filterCallback = null) {
   let currentChunk = [];
   const chunks = [];
+
+  if (typeof filterCallback === 'function') {
+    inputList = inputList.filter(filterCallback);
+  }
 
   inputList.forEach((item, i) => {
     currentChunk.push(item);
@@ -76,8 +81,25 @@ function objectFromBuffer(objectData) {
   return parsedObj;
 }
 
+/**
+ * @param {String} str
+ * @return {Boolean}
+ */
+function isURL(str) {
+  const pattern = new RegExp('^(https?:\\/\\/)?'+
+  '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|'+
+  '((\\d{1,3}\\.){3}\\d{1,3}))'+
+  '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+
+  '(\\?[;&a-z\\d%_.~+=-]*)?'+
+  '(\\#[-a-z\\d_]*)?$','i');
+
+  return pattern.test(str);
+}
+
 module.exports = {
   getChunkedList,
   validateAuditRequest,
   objectFromBuffer,
+  isURL,
 };
+

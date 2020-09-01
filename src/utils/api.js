@@ -76,9 +76,7 @@ function validateAuditRequest(requestPayload, maxUrlEntries) {
  */
 function objectFromBuffer(objectData) {
   const buff = new Buffer(objectData, 'base64');
-  const parsedObj = JSON.parse(buff.toString('ascii'));
-
-  return parsedObj;
+  return JSON.parse(buff.toString('ascii'));
 }
 
 /**
@@ -91,7 +89,7 @@ function isURL(str) {
   '((\\d{1,3}\\.){3}\\d{1,3}))'+
   '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+
   '(\\?[;&a-z\\d%_.~+=-]*)?'+
-  '(\\#[-a-z\\d_]*)?$','i');
+  '(\\#[-a-z\\d_]*)?$', 'i');
 
   return pattern.test(str);
 }

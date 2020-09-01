@@ -73,7 +73,7 @@ class LighthouseAudit {
    * @return {Promise}
    */
   async performAudit(url, page, blockedUrlPatterns) {
-    const port = await page.browser().wsEndpoint().split(':')[2].split('/')[0];
+    const port = page.browser().wsEndpoint().split(':')[2].split('/')[0];
     const options = {
       blockedUrlPatterns,
       port,
@@ -100,10 +100,10 @@ class LighthouseAudit {
    */
   getBQFormatResults() {
     const today = new Date().toJSON().slice(0, 10);
-    const formattedAudits = this.auditResults.map((audit) => {
-      if (typeof(audit) != 'undefined') {
-        const formattedAudit = Object.entries(this.auditFieldMapping)
-            .reduce((res, keyVal) => {
+    return this.auditResults.map((audit) => {
+      if (typeof (audit) != 'undefined') {
+        const formattedAudit = Object.entries(this.auditFieldMapping).
+            reduce((res, keyVal) => {
               res[keyVal[0]] = audit[keyVal[1]].numericValue;
               return res;
             }, {});
@@ -115,8 +115,6 @@ class LighthouseAudit {
         return formattedAudit;
       }
     });
-
-    return formattedAudits;
   }
 
   /**

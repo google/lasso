@@ -5,6 +5,17 @@ import {html, Component} from 'https://unpkg.com/htm/preact/standalone.module.js
  */
 class AuditForm extends Component {
   /**
+   * @param {Object} props
+   */
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      submitInProgress: false,
+    };
+  }
+
+  /**
    * handleSubmit
    * @param {Object} e
    */
@@ -22,7 +33,6 @@ class AuditForm extends Component {
 
     reader.onload = ((e) => {
       formObject['urlsTxt'] = e.target.result;
-      // TODO: Run validation on all content before calling submit request
       this.submitTasksRequest(formObject);
     });
 
@@ -37,10 +47,22 @@ class AuditForm extends Component {
     const requestObject = {};
     requestObject['urls'] = formData['urlsTxt'].split('\n');
 
+    this.setState({
+      submitInProgress: true,
+    });
+
     this.postData('/audit-async', requestObject)
         .then((data) => {
-          console.log(data);
+          this.setState({
+            submitInProgress: false,
+          });
+
+          this.resetInput();
         });
+  }
+
+  resetInput() {
+    document.getElementById('urlSubmitForm').reset();
   }
 
   /**
@@ -73,7 +95,7 @@ class AuditForm extends Component {
                 New bulk audit
               </div>
               <div class="panel-content">
-                <form onSubmit=${ (e) => this.handleSubmit(e) }>
+                <form onSubmit=${ (e) => this.handleSubmit(e) } id="urlSubmitForm">
                   <fieldset>
                     <p>
                     <label for="urls">
@@ -83,21 +105,19 @@ class AuditForm extends Component {
                     </label>
                     <input type="file" name="urls" />
                     </p>
-
                     <p>
                     <label for="blockedRequest">
                       <span>Blocked Requests</span>
                     </label>
-                    <textarea name="blockedRequests" id="about"></textarea>
+                    <textarea name="blockedRequests"></textarea>
                     </p>
-
                     <p>
                     <label for="urlsPerTask">
                       <span>URLs per task</span>
                     </label>
                     <input class="spinner" name="urlsPerTask" type="number" value="1" min="1" max="5" />
                     </p>
-                    <input type="submit" />
+                    <input type="submit" value=${(this.state.submitInProgress) ? 'Creating tasks...': 'Submit'} />
                   </fieldset>
                 </form>
               </div>

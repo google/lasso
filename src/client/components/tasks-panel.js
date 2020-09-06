@@ -5,7 +5,6 @@ import {html, Component} from 'https://unpkg.com/htm/preact/standalone.module.js
  */
 class TasksPanel extends Component {
   /**
-   * Constructor
    * @param {Object} props
    */
   constructor(props) {
@@ -37,7 +36,7 @@ class TasksPanel extends Component {
   }
 
   /**
-   * getItems
+   * @return {JSON}
    */
   async getItems() {
     const response = await fetch('/active-tasks');
@@ -45,7 +44,7 @@ class TasksPanel extends Component {
   }
 
   /**
-   * renderTaskRows
+   * @return {html}
    */
   renderTaskRows() {
     return this.state.tasksInView.map((task) => {
@@ -60,6 +59,9 @@ class TasksPanel extends Component {
     });
   }
 
+  /**
+   * @return {html}
+   */
   renderTable() {
     return html`
       <table>
@@ -80,10 +82,9 @@ class TasksPanel extends Component {
   }
 
   /**
-   * Render
    * @param {Object} props
    * @param {Object} state
-   * @return {*}
+   * @return {html}
    */
   render(props, state) {
     return html`
@@ -94,7 +95,7 @@ class TasksPanel extends Component {
          <div class="panel-content">
            ${(this.state.tasksInView.length > 0) ? this.renderTable() : 'No tasks in queue'}
          </div>
-       </main>
+      </main>
         `;
   }
 }

@@ -10,7 +10,7 @@ Tag the built image for GCR targeting the cloud project
 
 `docker tag lasso gcr.io/[CLOUD-PROJECT-ID]/lasso:[TAG]`
 
-Push to GCR (Make sure the GCR API is [enabled](https://console.cloud.google.com/apis/api/containerregistry.googleapis.com/overview?project=lasso-285806) already)
+Push to GCR (Make sure the GCR API is [enabled](https://console.cloud.google.com/apis/api/containerregistry.googleapis.com/overview) already)
 
 `docker push gcr.io/[CLOUD-PROJECT-ID]/lasso:[TAG]`
 

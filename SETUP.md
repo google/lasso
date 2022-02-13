@@ -22,6 +22,7 @@ The following ENV variables will need to be configured on cloud run:
 | ------------- | ------------- |
 | BQ_DATASET  | The name of a BigQuery dataset containing your results table |
 | BQ_TABLE  | The name of the BQ table to output results to |
+| GOOGLE_CLOUD_PROJECT  | ID of your cloud project |
 | CLOUD_TASKS_QUEUE  | Name of your cloud tasks queue |
 | CLOUD_TASKS_QUEUE_LOCATION  | Location of the cloud task queue |
 | SERVICE_URL  | base url and protocol of the deployed service on cloud run |

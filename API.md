@@ -29,7 +29,7 @@ curl -X POST \
   }'
 ```
 
-### /bulk-schedule (POST)
+### /audit-async (POST)
 
 Schedules one or more audits to run asynchronously, utilizing [Cloud Tasks](https://cloud.google.com/tasks). Each dispatched task calls `/audit` as a target to run and log the test.
 
@@ -42,7 +42,7 @@ Schedules one or more audits to run asynchronously, utilizing [Cloud Tasks](http
 
 ```
 curl -X POST \
-  http://127.0.0.1:8080/bulk-schedule \
+  http://127.0.0.1:8080/audit-async \
   -H 'content-type: application/json' \
   -d '{
   "urls": [
